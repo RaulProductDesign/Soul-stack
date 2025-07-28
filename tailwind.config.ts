@@ -14,6 +14,14 @@ export default {
     },
     extend: {
       colors: {
+        // Soul Stack custom colors
+        'soul-background': '#FBEFE7',
+        'soul-text': '#2D2825',
+        'soul-text-subtle': '#4D4845',
+        'soul-friends': '#FAB183',
+        'soul-partner': '#A7CBF0',
+        'soul-family': '#FAE683',
+        // Original shadcn colors (keeping for compatibility)
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -57,6 +65,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        'lato': ['Lato', 'system-ui', 'sans-serif'],
+        'lora': ['Lora', 'system-ui', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
