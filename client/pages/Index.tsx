@@ -1,61 +1,53 @@
-import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchDemo();
-  }, []);
-
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
-    try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
+    <div className="min-h-screen bg-soul-background flex flex-col justify-center items-center px-4 py-20 gap-20 md:gap-28">
+      {/* Welcome Container */}
+      <div className="flex flex-col items-center w-full max-w-xs">
+        <div className="text-soul-text-subtle text-center font-lato text-lg md:text-xl font-light mb-2">
+          Welcome to
+        </div>
+        <div className="text-soul-text text-center font-lora text-4xl md:text-5xl font-bold leading-tight tracking-tight">
+          Soul Stack
+        </div>
+      </div>
+
+      {/* Question Container */}
+      <div className="flex flex-col items-center w-full max-w-sm gap-5">
+        <div className="text-soul-text-subtle text-center font-lato text-lg font-light">
+          Who's your deep talk today?
+        </div>
+        
+        {/* Button Container */}
+        <div className="flex flex-col w-full gap-2">
+          <Link 
+            to="/friends"
+            className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-friends hover:opacity-90 transition-opacity"
           >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
+            <span className="text-soul-text font-lora text-lg font-medium">
+              Friends
+            </span>
+          </Link>
+          
+          <Link 
+            to="/partner"
+            className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-partner hover:opacity-90 transition-opacity"
+          >
+            <span className="text-soul-text font-lora text-lg font-medium">
+              Partner
+            </span>
+          </Link>
+          
+          <Link 
+            to="/family"
+            className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-family hover:opacity-90 transition-opacity"
+          >
+            <span className="text-soul-text font-lora text-lg font-medium">
+              Family
+            </span>
+          </Link>
+        </div>
       </div>
     </div>
   );
