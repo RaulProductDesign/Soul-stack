@@ -65,9 +65,9 @@ export default function Friends() {
 
   const handleTouchEnd = () => {
     if (!isDragging || questions.length <= 1) return;
-    
-    const threshold = 100; // Minimum swipe distance
-    
+
+    const threshold = 40; // Much lower threshold for easier swiping
+
     if (Math.abs(dragOffset.x) > threshold) {
       if (dragOffset.x > 0) {
         // Swipe right - go to previous card
@@ -77,7 +77,7 @@ export default function Friends() {
         nextCard();
       }
     }
-    
+
     // Reset drag state
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
