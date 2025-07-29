@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { fetchQuestionsByCategory } from "@/lib/questionsService";
 import { QuestionCard } from "@shared/sheety";
 
@@ -8,6 +8,10 @@ export default function Partner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -39,26 +43,96 @@ export default function Partner() {
     }
   };
 
+  // Touch event handlers for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (questions.length <= 1) return;
+    const touch = e.touches[0];
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || questions.length <= 1) return;
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - dragStart.x;
+    const deltaY = touch.clientY - dragStart.y;
+    
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      setDragOffset({ x: deltaX, y: 0 });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging || questions.length <= 1) return;
+    
+    const threshold = 100;
+    
+    if (Math.abs(dragOffset.x) > threshold) {
+      if (dragOffset.x > 0) {
+        prevCard();
+      } else {
+        nextCard();
+      }
+    }
+    
+    setIsDragging(false);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  // Mouse event handlers for desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (questions.length <= 1) return;
+    setDragStart({ x: e.clientX, y: e.clientY });
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || questions.length <= 1) return;
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      setDragOffset({ x: deltaX, y: 0 });
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging || questions.length <= 1) return;
+    
+    const threshold = 100;
+    
+    if (Math.abs(dragOffset.x) > threshold) {
+      if (dragOffset.x > 0) {
+        prevCard();
+      } else {
+        nextCard();
+      }
+    }
+    
+    setIsDragging(false);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
   const currentQuestion = questions[currentIndex];
 
   return (
     <div className="min-h-screen bg-soul-background flex flex-col">
       {/* Back Button */}
       <div className="p-4 pt-16">
-        <Link
+        <Link 
           to="/"
           className="inline-flex h-10 px-4 items-center gap-2 rounded-full border border-soul-text hover:bg-soul-text/5 transition-colors"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
+          <svg 
+            className="w-6 h-6" 
+            fill="none" 
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
           >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M8.61092 11.293L14.2679 5.63601L15.6819 7.05001L10.7319 12L15.6819 16.95L14.2679 18.364L8.61092 12.707C8.42344 12.5195 8.31813 12.2652 8.31813 12C8.31813 11.7348 8.42344 11.4805 8.61092 11.293Z"
+            <path 
+              fillRule="evenodd" 
+              clipRule="evenodd" 
+              d="M8.61092 11.293L14.2679 5.63601L15.6819 7.05001L10.7319 12L15.6819 16.95L14.2679 18.364L8.61092 12.707C8.42344 12.5195 8.31813 12.2652 8.31813 12C8.31813 11.7348 8.42344 11.4805 8.61092 11.293Z" 
               fill="#4D4845"
             />
           </svg>
@@ -75,7 +149,7 @@ export default function Partner() {
           <h1 className="text-soul-text-subtle text-center font-lora text-2xl font-bold tracking-tight">
             Partner
           </h1>
-
+          
           {/* Loading State */}
           {loading && (
             <div className="w-full h-56 rounded-3xl bg-soul-partner shadow-lg p-6 flex items-center justify-center">
@@ -97,27 +171,38 @@ export default function Partner() {
           {/* Questions Card Stack */}
           {!loading && !error && questions.length > 0 && (
             <>
-              <div className="relative w-full">
+              <div className="relative w-full touch-none">
                 {/* Card Stack Background Cards */}
                 {currentIndex < questions.length - 2 && (
-                  <div
+                  <div 
                     className="absolute inset-x-0 top-4 mx-2 h-52 rounded-3xl bg-soul-partner shadow-md transform scale-95"
                     style={{ zIndex: 1 }}
                   />
                 )}
-
+                
                 {currentIndex < questions.length - 1 && (
-                  <div
+                  <div 
                     className="absolute inset-x-0 top-2 mx-1 h-52 rounded-3xl bg-soul-partner shadow-md transform scale-97"
                     style={{ zIndex: 2 }}
                   />
                 )}
-
+                
                 {/* Main Card */}
-                <div
-                  className="relative h-56 rounded-3xl bg-soul-partner shadow-lg p-6 flex items-center justify-center cursor-pointer"
-                  style={{ zIndex: 3 }}
-                  onClick={nextCard}
+                <div 
+                  ref={cardRef}
+                  className="relative h-56 rounded-3xl bg-soul-partner shadow-lg p-6 flex items-center justify-center cursor-grab active:cursor-grabbing select-none transition-transform duration-200"
+                  style={{ 
+                    zIndex: 3,
+                    transform: `translateX(${dragOffset.x}px) ${isDragging ? 'rotate(' + (dragOffset.x * 0.1) + 'deg)' : ''}`,
+                    opacity: isDragging ? Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300) : 1
+                  }}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
                 >
                   <p className="text-soul-text font-lora text-lg font-medium text-center leading-relaxed">
                     {currentQuestion?.question}
@@ -125,33 +210,20 @@ export default function Partner() {
                 </div>
               </div>
 
-              {/* Navigation Controls */}
-              <div className="flex items-center justify-between w-full px-4">
-                <button
-                  onClick={prevCard}
-                  disabled={currentIndex === 0}
-                  className="px-4 py-2 rounded-full border border-soul-text disabled:opacity-50 disabled:cursor-not-allowed hover:bg-soul-text/5 transition-colors"
-                >
-                  <span className="text-soul-text font-lora text-sm">Previous</span>
-                </button>
-
-                <span className="text-soul-text-subtle font-lato text-sm">
-                  {currentIndex + 1} of {questions.length}
-                </span>
-
-                <button
-                  onClick={nextCard}
-                  disabled={currentIndex === questions.length - 1}
-                  className="px-4 py-2 rounded-full border border-soul-text disabled:opacity-50 disabled:cursor-not-allowed hover:bg-soul-text/5 transition-colors"
-                >
-                  <span className="text-soul-text font-lora text-sm">Next</span>
-                </button>
+              {/* Swipe Instructions */}
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-soul-text-subtle font-lato text-sm text-center opacity-75">
+                  Swipe left for next • Swipe right for previous
+                </p>
+                {currentIndex > 0 && (
+                  <button
+                    onClick={prevCard}
+                    className="px-4 py-1 rounded-full text-soul-text-subtle font-lato text-xs hover:bg-soul-text/5 transition-colors"
+                  >
+                    See previous
+                  </button>
+                )}
               </div>
-
-              {/* Tap hint */}
-              <p className="text-soul-text-subtle font-lato text-sm text-center opacity-75">
-                Tap the card or use buttons to navigate
-              </p>
             </>
           )}
 
