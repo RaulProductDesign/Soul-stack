@@ -95,7 +95,7 @@ export default function Friends() {
   // Mouse event handlers for desktop
   const handleMouseDown = (e: React.MouseEvent) => {
     if (questions.length <= 1) return;
-    setDragStart({ x: e.clientX, y: e.clientY });
+    setDragStart({ x: e.clientX, y: e.clientY, time: Date.now() });
     setIsDragging(true);
   };
 
