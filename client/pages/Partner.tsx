@@ -8,7 +8,7 @@ export default function Partner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0, time: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -47,7 +47,7 @@ export default function Partner() {
   const handleTouchStart = (e: React.TouchEvent) => {
     if (questions.length <= 1) return;
     const touch = e.touches[0];
-    setDragStart({ x: touch.clientX, y: touch.clientY });
+    setDragStart({ x: touch.clientX, y: touch.clientY, time: Date.now() });
     setIsDragging(true);
   };
 
@@ -64,17 +64,26 @@ export default function Partner() {
 
   const handleTouchEnd = () => {
     if (!isDragging || questions.length <= 1) return;
-    
-    const threshold = 100;
-    
-    if (Math.abs(dragOffset.x) > threshold) {
+
+    const threshold = 40; // Distance threshold
+    const timeThreshold = 300; // Maximum time for a quick swipe (ms)
+    const velocityThreshold = 0.3; // Minimum velocity (pixels per ms)
+
+    const deltaTime = Date.now() - dragStart.time;
+    const velocity = Math.abs(dragOffset.x) / deltaTime;
+
+    // Trigger swipe if distance threshold is met OR if it's a quick swipe with good velocity
+    const shouldSwipe = Math.abs(dragOffset.x) > threshold ||
+                       (deltaTime < timeThreshold && velocity > velocityThreshold);
+
+    if (shouldSwipe) {
       if (dragOffset.x > 0) {
         prevCard();
       } else {
         nextCard();
       }
     }
-    
+
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
   };
@@ -82,7 +91,7 @@ export default function Partner() {
   // Mouse event handlers for desktop
   const handleMouseDown = (e: React.MouseEvent) => {
     if (questions.length <= 1) return;
-    setDragStart({ x: e.clientX, y: e.clientY });
+    setDragStart({ x: e.clientX, y: e.clientY, time: Date.now() });
     setIsDragging(true);
   };
 
@@ -98,17 +107,26 @@ export default function Partner() {
 
   const handleMouseUp = () => {
     if (!isDragging || questions.length <= 1) return;
-    
-    const threshold = 100;
-    
-    if (Math.abs(dragOffset.x) > threshold) {
+
+    const threshold = 40; // Distance threshold
+    const timeThreshold = 300; // Maximum time for a quick swipe (ms)
+    const velocityThreshold = 0.3; // Minimum velocity (pixels per ms)
+
+    const deltaTime = Date.now() - dragStart.time;
+    const velocity = Math.abs(dragOffset.x) / deltaTime;
+
+    // Trigger swipe if distance threshold is met OR if it's a quick swipe with good velocity
+    const shouldSwipe = Math.abs(dragOffset.x) > threshold ||
+                       (deltaTime < timeThreshold && velocity > velocityThreshold);
+
+    if (shouldSwipe) {
       if (dragOffset.x > 0) {
         prevCard();
       } else {
         nextCard();
       }
     }
-    
+
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
   };
