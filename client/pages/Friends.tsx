@@ -102,9 +102,9 @@ export default function Friends() {
 
   const handleMouseUp = () => {
     if (!isDragging || questions.length <= 1) return;
-    
-    const threshold = 100;
-    
+
+    const threshold = 40; // Much lower threshold for easier swiping
+
     if (Math.abs(dragOffset.x) > threshold) {
       if (dragOffset.x > 0) {
         prevCard();
@@ -112,7 +112,7 @@ export default function Friends() {
         nextCard();
       }
     }
-    
+
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
   };
