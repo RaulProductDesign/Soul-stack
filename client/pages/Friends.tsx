@@ -66,9 +66,18 @@ export default function Friends() {
   const handleTouchEnd = () => {
     if (!isDragging || questions.length <= 1) return;
 
-    const threshold = 40; // Much lower threshold for easier swiping
+    const threshold = 40; // Distance threshold
+    const timeThreshold = 300; // Maximum time for a quick swipe (ms)
+    const velocityThreshold = 0.3; // Minimum velocity (pixels per ms)
 
-    if (Math.abs(dragOffset.x) > threshold) {
+    const deltaTime = Date.now() - dragStart.time;
+    const velocity = Math.abs(dragOffset.x) / deltaTime;
+
+    // Trigger swipe if distance threshold is met OR if it's a quick swipe with good velocity
+    const shouldSwipe = Math.abs(dragOffset.x) > threshold ||
+                       (deltaTime < timeThreshold && velocity > velocityThreshold);
+
+    if (shouldSwipe) {
       if (dragOffset.x > 0) {
         // Swipe right - go to previous card
         prevCard();
