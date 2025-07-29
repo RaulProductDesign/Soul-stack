@@ -47,7 +47,7 @@ export default function Friends() {
   const handleTouchStart = (e: React.TouchEvent) => {
     if (questions.length <= 1) return;
     const touch = e.touches[0];
-    setDragStart({ x: touch.clientX, y: touch.clientY });
+    setDragStart({ x: touch.clientX, y: touch.clientY, time: Date.now() });
     setIsDragging(true);
   };
 
