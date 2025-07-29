@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { fetchQuestionsByCategory } from "@/lib/questionsService";
 import { QuestionCard } from "@shared/sheety";
 
@@ -8,6 +8,10 @@ export default function Family() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -37,6 +41,76 @@ export default function Family() {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
+  };
+
+  // Touch event handlers for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (questions.length <= 1) return;
+    const touch = e.touches[0];
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || questions.length <= 1) return;
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - dragStart.x;
+    const deltaY = touch.clientY - dragStart.y;
+    
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      setDragOffset({ x: deltaX, y: 0 });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging || questions.length <= 1) return;
+    
+    const threshold = 100;
+    
+    if (Math.abs(dragOffset.x) > threshold) {
+      if (dragOffset.x > 0) {
+        prevCard();
+      } else {
+        nextCard();
+      }
+    }
+    
+    setIsDragging(false);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  // Mouse event handlers for desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (questions.length <= 1) return;
+    setDragStart({ x: e.clientX, y: e.clientY });
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || questions.length <= 1) return;
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      setDragOffset({ x: deltaX, y: 0 });
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging || questions.length <= 1) return;
+    
+    const threshold = 100;
+    
+    if (Math.abs(dragOffset.x) > threshold) {
+      if (dragOffset.x > 0) {
+        prevCard();
+      } else {
+        nextCard();
+      }
+    }
+    
+    setIsDragging(false);
+    setDragOffset({ x: 0, y: 0 });
   };
 
   const currentQuestion = questions[currentIndex];
@@ -97,7 +171,7 @@ export default function Family() {
           {/* Questions Card Stack */}
           {!loading && !error && questions.length > 0 && (
             <>
-              <div className="relative w-full">
+              <div className="relative w-full touch-none">
                 {/* Card Stack Background Cards */}
                 {currentIndex < questions.length - 2 && (
                   <div 
@@ -115,9 +189,20 @@ export default function Family() {
                 
                 {/* Main Card */}
                 <div 
-                  className="relative h-56 rounded-3xl bg-soul-family shadow-lg p-6 flex items-center justify-center cursor-pointer"
-                  style={{ zIndex: 3 }}
-                  onClick={nextCard}
+                  ref={cardRef}
+                  className="relative h-56 rounded-3xl bg-soul-family shadow-lg p-6 flex items-center justify-center cursor-grab active:cursor-grabbing select-none transition-transform duration-200"
+                  style={{ 
+                    zIndex: 3,
+                    transform: `translateX(${dragOffset.x}px) ${isDragging ? 'rotate(' + (dragOffset.x * 0.1) + 'deg)' : ''}`,
+                    opacity: isDragging ? Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300) : 1
+                  }}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
                 >
                   <p className="text-soul-text font-lora text-lg font-medium text-center leading-relaxed">
                     {currentQuestion?.question}
@@ -125,33 +210,20 @@ export default function Family() {
                 </div>
               </div>
 
-              {/* Navigation Controls */}
-              <div className="flex items-center justify-between w-full px-4">
-                <button
-                  onClick={prevCard}
-                  disabled={currentIndex === 0}
-                  className="px-4 py-2 rounded-full border border-soul-text disabled:opacity-50 disabled:cursor-not-allowed hover:bg-soul-text/5 transition-colors"
-                >
-                  <span className="text-soul-text font-lora text-sm">Previous</span>
-                </button>
-                
-                <span className="text-soul-text-subtle font-lato text-sm">
-                  {currentIndex + 1} of {questions.length}
-                </span>
-                
-                <button
-                  onClick={nextCard}
-                  disabled={currentIndex === questions.length - 1}
-                  className="px-4 py-2 rounded-full border border-soul-text disabled:opacity-50 disabled:cursor-not-allowed hover:bg-soul-text/5 transition-colors"
-                >
-                  <span className="text-soul-text font-lora text-sm">Next</span>
-                </button>
+              {/* Swipe Instructions */}
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-soul-text-subtle font-lato text-sm text-center opacity-75">
+                  Swipe left for next • Swipe right for previous
+                </p>
+                {currentIndex > 0 && (
+                  <button
+                    onClick={prevCard}
+                    className="px-4 py-1 rounded-full text-soul-text-subtle font-lato text-xs hover:bg-soul-text/5 transition-colors"
+                  >
+                    See previous
+                  </button>
+                )}
               </div>
-
-              {/* Tap hint */}
-              <p className="text-soul-text-subtle font-lato text-sm text-center opacity-75">
-                Tap the card or use buttons to navigate
-              </p>
             </>
           )}
 
