@@ -62,7 +62,7 @@ export default function Family() {
               fill="#4D4845"
             />
           </svg>
-          <span className="text-soul-text font-lora text-lg font-medium">
+          <span className="text-soul-text font-lora text-sm sm:text-lg font-medium">
             back
           </span>
         </Link>
