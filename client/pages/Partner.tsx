@@ -8,8 +8,6 @@ export default function Partner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animationDirection, setAnimationDirection] = useState<'next' | 'prev'>('next');
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -30,24 +28,14 @@ export default function Partner() {
   }, []);
 
   const nextCard = () => {
-    if (currentIndex < questions.length - 1 && !isAnimating) {
-      setAnimationDirection('next');
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentIndex(currentIndex + 1);
-        setIsAnimating(false);
-      }, 200);
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
     }
   };
 
   const prevCard = () => {
-    if (currentIndex > 0 && !isAnimating) {
-      setAnimationDirection('prev');
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentIndex(currentIndex - 1);
-        setIsAnimating(false);
-      }, 200);
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
     }
   };
 
@@ -109,7 +97,7 @@ export default function Partner() {
           {/* Questions Card Stack */}
           {!loading && !error && questions.length > 0 && (
             <>
-              <div className="relative w-full overflow-hidden">
+              <div className="relative w-full">
                 {/* Card Stack Background Cards */}
                 {currentIndex < questions.length - 2 && (
                   <div 
@@ -127,63 +115,28 @@ export default function Partner() {
                 
                 {/* Main Card */}
                 <div 
-                  className={`relative h-56 rounded-3xl bg-soul-partner shadow-lg p-6 flex items-center justify-center transition-all duration-200 ease-in-out ${
-                    isAnimating 
-                      ? animationDirection === 'next' 
-                        ? 'transform -translate-x-full opacity-0' 
-                        : 'transform translate-x-full opacity-0'
-                      : 'transform translate-x-0 opacity-100'
-                  }`}
+                  className="relative h-56 rounded-3xl bg-soul-partner shadow-lg p-6 flex items-center justify-center"
                   style={{ zIndex: 3 }}
                 >
                   <p className="text-soul-text font-lora text-lg font-medium text-center leading-relaxed">
                     {currentQuestion?.question}
                   </p>
                 </div>
-
-                {/* Next Card (sliding in) */}
-                {isAnimating && (
-                  <div 
-                    className={`absolute inset-0 h-56 rounded-3xl bg-soul-partner shadow-lg p-6 flex items-center justify-center transition-all duration-200 ease-in-out ${
-                      animationDirection === 'next' 
-                        ? 'transform translate-x-0 opacity-100' 
-                        : 'transform -translate-x-0 opacity-100'
-                    }`}
-                    style={{ 
-                      zIndex: 4,
-                      transform: isAnimating 
-                        ? 'translateX(0)' 
-                        : animationDirection === 'next' 
-                          ? 'translateX(100%)' 
-                          : 'translateX(-100%)'
-                    }}
-                  >
-                    <p className="text-soul-text font-lora text-lg font-medium text-center leading-relaxed">
-                      {animationDirection === 'next' 
-                        ? questions[currentIndex + 1]?.question 
-                        : questions[currentIndex - 1]?.question}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Navigation Controls */}
               <div className="flex items-center justify-between w-full px-4 gap-4">
                 <button
                   onClick={prevCard}
-                  disabled={currentIndex === 0 || isAnimating}
+                  disabled={currentIndex === 0}
                   className="flex-1 px-6 py-3 rounded-full border border-soul-text disabled:opacity-50 disabled:cursor-not-allowed hover:bg-soul-text/5 transition-colors"
                 >
                   <span className="text-soul-text font-lora text-sm">Previous</span>
                 </button>
                 
-                <span className="text-soul-text-subtle font-lato text-sm whitespace-nowrap">
-                  {currentIndex + 1} of {questions.length}
-                </span>
-                
                 <button
                   onClick={nextCard}
-                  disabled={currentIndex === questions.length - 1 || isAnimating}
+                  disabled={currentIndex === questions.length - 1}
                   className="flex-1 px-6 py-3 rounded-full border border-soul-text disabled:opacity-50 disabled:cursor-not-allowed hover:bg-soul-text/5 transition-colors"
                 >
                   <span className="text-soul-text font-lora text-sm">Next</span>
