@@ -23,10 +23,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/splash" element={<Splash />} />
           <Route path="/" element={<Index />} />
-          <Route path="/friends" element={<Friends />} />
-          <Route path="/partner" element={<Partner />} />
-          <Route path="/family" element={<Family />} />
+          <Route path="/friends" element={<FriendsLevels />} />
+          <Route path="/partner" element={<PartnerLevels />} />
+          <Route path="/family" element={<FamilyLevels />} />
+          <Route path="/:category/questions/:layer" element={<Questions />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
