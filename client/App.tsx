@@ -6,10 +6,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Splash from "./pages/Splash";
 import Index from "./pages/Index";
-import Friends from "./pages/Friends";
-import Partner from "./pages/Partner";
-import Family from "./pages/Family";
+import FriendsLevels from "./pages/FriendsLevels";
+import PartnerLevels from "./pages/PartnerLevels";
+import FamilyLevels from "./pages/FamilyLevels";
+import Questions from "./pages/Questions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
