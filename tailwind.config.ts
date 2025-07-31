@@ -15,7 +15,7 @@ export default {
     extend: {
       colors: {
         // Soul Stack custom colors
-        'soul-background': '#FBEFE7',
+        'soul-background': 'hsl(24, 78%, 94%)',
         'soul-text': '#2D2825',
         'soul-text-subtle': '#4D4845',
         'soul-friends': '#FAB183',
