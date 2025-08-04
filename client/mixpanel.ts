@@ -6,5 +6,8 @@ mixpanel.init('5463b005fe8187d776de3095c3865c46', {
   persistence: 'localStorage',
 });
 
-// Export para usarlo en cualquier parte
-export default mixpanel;
+export function trackCategorySelected(category: "friends" | "partner" | "family") {
+    mixpanel.track("Category Selected", {
+      category,
+    });
+  }
