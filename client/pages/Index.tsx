@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { trackCategorySelected } from "@/lib/mixpanel";
+import { trackCategorySelected } from "../mixpanel";
 
 export default function Index() {
   const navigate = useNavigate();
