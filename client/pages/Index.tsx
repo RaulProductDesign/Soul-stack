@@ -1,14 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { trackCategorySelected } from "../mixpanel";
 
 export default function Index() {
-  const navigate = useNavigate();
-
-  const handleCategoryClick = (category: "friends" | "partner" | "family") => {
-    trackCategorySelected(category);
-    navigate(`/${category}`);
-  };
-
   return (
     <div className="min-h-screen bg-soul-background flex flex-col">
       {/* Main Content */}
@@ -21,32 +14,35 @@ export default function Index() {
 
           {/* Button Container */}
           <div className="flex flex-col w-full gap-2">
-            <button
-              onClick={() => handleCategoryClick("friends")}
+            <Link
+              to="/friends"
+              onClick={() => trackCategorySelected("friends")}
               className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-friends hover:opacity-90 transition-opacity"
             >
               <span className="text-soul-text font-lora text-lg font-medium">
                 Friends
               </span>
-            </button>
+            </Link>
 
-            <button
-              onClick={() => handleCategoryClick("partner")}
+            <Link
+              to="/partner"
+              onClick={() => trackCategorySelected("partner")}
               className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-partner hover:opacity-90 transition-opacity"
             >
               <span className="text-soul-text font-lora text-lg font-medium">
                 Partner
               </span>
-            </button>
+            </Link>
 
-            <button
-              onClick={() => handleCategoryClick("family")}
+            <Link
+              to="/family"
+              onClick={() => trackCategorySelected("family")}
               className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-family hover:opacity-90 transition-opacity"
             >
               <span className="text-soul-text font-lora text-lg font-medium">
                 Family
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>
