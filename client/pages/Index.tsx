@@ -1,11 +1,12 @@
-import { Link } from "react-router-dom";
-import mixpanel from "mixpanel-browser";
+import { Link, useNavigate } from "react-router-dom";
+import { trackCategorySelected } from "@/lib/mixpanel";
 
 export default function Index() {
-  const handleCategoryClick = (category: string) => {
-    mixpanel.track("Category Selected", {
-      category,
-    });
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (category: "friends" | "partner" | "family") => {
+    trackCategorySelected(category);
+    navigate(`/${category}`);
   };
 
   return (
@@ -20,35 +21,32 @@ export default function Index() {
 
           {/* Button Container */}
           <div className="flex flex-col w-full gap-2">
-            <Link
-              to="/friends"
+            <button
               onClick={() => handleCategoryClick("friends")}
               className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-friends hover:opacity-90 transition-opacity"
             >
               <span className="text-soul-text font-lora text-lg font-medium">
                 Friends
               </span>
-            </Link>
+            </button>
 
-            <Link
-              to="/partner"
+            <button
               onClick={() => handleCategoryClick("partner")}
               className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-partner hover:opacity-90 transition-opacity"
             >
               <span className="text-soul-text font-lora text-lg font-medium">
                 Partner
               </span>
-            </Link>
+            </button>
 
-            <Link
-              to="/family"
+            <button
               onClick={() => handleCategoryClick("family")}
               className="flex h-16 justify-center items-center rounded-full border border-soul-text bg-soul-family hover:opacity-90 transition-opacity"
             >
               <span className="text-soul-text font-lora text-lg font-medium">
                 Family
               </span>
-            </Link>
+            </button>
           </div>
         </div>
       </div>
