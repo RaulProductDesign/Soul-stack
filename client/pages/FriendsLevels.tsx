@@ -1,6 +1,24 @@
 import { Link } from "react-router-dom";
+import mixpanel from "mixpanel-browser";
 
 export default function FriendsLevels() {
+  const CATEGORY = "friends";
+  const DECK_VERSION = import.meta?.env?.VITE_DECK_VERSION ?? "2025-08";
+
+  function trackLevel(level_id, level_label, level_order) {
+    try {
+      mixpanel.track("Level Selected", {
+        category: CATEGORY,
+        level_id,
+        level_label,
+        level_order,
+        deck_version: DECK_VERSION,
+      });
+    } catch (_) {
+      // fail silently — navigation should never be blocked by analytics
+    }
+  }
+
   return (
     <div className="min-h-screen bg-soul-background flex flex-col">
       {/* Back Button */}
@@ -34,6 +52,7 @@ export default function FriendsLevels() {
           {/* Level 1: Break the Ice */}
           <Link
             to="/friends/questions/1"
+            onClick={() => trackLevel("icebreaker", "Break the Ice", 1)}
             className="flex flex-col p-6 rounded-2xl border border-soul-text bg-soul-friends hover:opacity-90 transition-opacity"
           >
             <div className="text-soul-text font-lato text-xs font-normal text-center mb-1">
@@ -50,6 +69,7 @@ export default function FriendsLevels() {
           {/* Level 2: Getting Real */}
           <Link
             to="/friends/questions/2"
+            onClick={() => trackLevel("deep", "Getting Real", 2)}
             className="flex flex-col p-6 rounded-2xl border border-soul-text bg-soul-friends hover:opacity-90 transition-opacity"
           >
             <div className="text-soul-text font-lato text-xs font-normal text-center mb-1">
@@ -67,6 +87,7 @@ export default function FriendsLevels() {
           {/* Level 3: Go Deep */}
           <Link
             to="/friends/questions/3"
+            onClick={() => trackLevel("spicy", "Go Deep", 3)}
             className="flex flex-col p-6 rounded-2xl border border-soul-text bg-soul-friends hover:opacity-90 transition-opacity"
           >
             <div className="text-soul-text font-lato text-xs font-normal text-center mb-1">
